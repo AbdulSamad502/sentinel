@@ -8,8 +8,6 @@ one question continuously:
 
 > Is what this agent is doing safe, correct, and shippable?
 
-Built for the AWS **Agents for Humans** hackathon (Professional Agents track).
-
 ## The problem
 
 Developers increasingly hand real work to AI coding agents. Those agents can
@@ -41,7 +39,8 @@ Sentinel **observes, analyses, and reports**. It does not act on your codebase.
    the signals above with CI/test status into one verdict and plain-English
    reasons.
 4. **Natural-Language Control** — ask it things like *"What went wrong?"*,
-   *"Why did you stop it?"*, *"Can we ship?"* from a terminal or from Telegram.
+   *"Why did you stop it?"*, *"Can we ship?"* from the dashboard, a terminal,
+   or Telegram.
 5. **Change Explainer** — answers *"what did it just do?"* in plain English,
    from what Sentinel independently watched happen.
 6. **Project Norms** — the rules *your* project holds its agent to, written in
@@ -56,15 +55,15 @@ Clients:  CLI watcher + git hooks  ·  Telegram bot  ·  dashboard  ·  MCP (the
                      |
 Orchestrator:  the verdict, computed deterministically, on your machine
                      |
-run_agent()  ->  one of three model providers, chosen by SENTINEL_PROVIDER
+run_agent()  ->  one of four model providers, chosen by SENTINEL_PROVIDER
                      |
-   ollama            bedrock              agentcore
-   a model on        AWS Bedrock, with    Sentinel's hosted runtime on
-   this laptop       your credentials     Bedrock AgentCore (no setup at all)
+  ollama          bedrock           groq            agentcore
+  a model on      AWS Bedrock,      Groq's API,     a container you deploy
+  this laptop     your credentials  your key        to Bedrock AgentCore
 ```
 
 The model provider lives behind a single seam in
-[`sentinel/llm.py`](sentinel/llm.py), so switching between the three is one
+[`sentinel/llm.py`](sentinel/llm.py), so switching between the four is one
 environment variable. Every interface goes through one function,
 `query.answer()`, for the same reason.
 
@@ -82,7 +81,7 @@ default, and on it nothing leaves your machine.
 | --- | --- | --- |
 | `ollama` *(default)* | on your laptop | nothing |
 | `bedrock` | in **your own** AWS account | diffs, to an account you control, under your IAM role |
-| `agentcore` | in our hosted runtime | diffs, to that runtime — never stored, never used for a verdict |
+| `agentcore` | in a runtime **you** deploy | diffs, to that runtime — never stored, never used for a verdict |
 | `groq` | Groq's API | diffs, to a third party |
 
 What is sent, on the three non-local providers, is the diff of what your coding
@@ -108,12 +107,13 @@ in any direction can change your code.
 
 ## Setup
 
-Requires Python 3.11+ and [Ollama](https://ollama.com) for local development.
+Requires Python 3.11+. [Ollama](https://ollama.com) runs the model locally, and
+Node 20+ builds the dashboard.
 
 ```bash
 git clone <repo-url> && cd Sentinel
 python -m venv .venv
-.venv/Scripts/activate          # Windows; use source .venv/bin/activate on macOS/Linux
+source .venv/bin/activate       # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -138,20 +138,33 @@ or just preference), set the model explicitly:
 SENTINEL_MODEL=qwen3:4b python tests/hello_agent.py
 ```
 
-### Running on AWS instead
+### Running on a hosted model instead
 
-Nothing above needs AWS. To run on Bedrock with your own credentials, or on the
-hosted runtime:
+Nothing above needs an account anywhere. To use a hosted model, set the provider
+and its model id — no other code or config changes:
 
 ```bash
 export SENTINEL_PROVIDER=bedrock
 export SENTINEL_BEDROCK_MODEL=<a model id your account can invoke>
+```
 
+```bash
+export SENTINEL_PROVIDER=groq
+export SENTINEL_GROQ_MODEL=<a current Groq model id>
+export GROQ_API_KEY=<your key>
+```
+
+The Groq key is read from the environment only, never from `sentinel.config.json`
+— that file is committed, and a secret has no business being offered a home in
+it. `agentcore` points this machine at a container you have deployed, via
+`SENTINEL_AGENTCORE_ENDPOINT`. Whichever you pick:
+
+```bash
 python -m sentinel.doctor .        # says which provider you are on, and what is missing
 ```
 
-Account, Bedrock access and credit setup are in
-[docs/aws-setup.md](docs/aws-setup.md); deploying the hosted runtime is in
+AWS account and Bedrock setup are in [docs/aws-setup.md](docs/aws-setup.md);
+building and deploying the runtime container is in
 [docs/deploy-agentcore.md](docs/deploy-agentcore.md).
 
 ## Watching a repo
@@ -415,6 +428,9 @@ export SENTINEL_TELEGRAM_ALLOWED_CHATS=12345   # your chat id
 python -m sentinel.interfaces.telegram /path/to/your/repo
 ```
 
+Or set it up from the dashboard's Telegram panel, which writes the same config
+to `~/.sentinel/telegram.json` and starts the bot for you.
+
 No new dependency — the Bot API is plain HTTPS JSON, so it uses the same stdlib
 approach as the GitHub client.
 
@@ -478,10 +494,22 @@ nothing.
 
 ## The dashboard
 
+The dashboard is the way most people use Sentinel. It keeps a registry of the
+repos you supervise and starts and stops the watcher processes itself, so
+nothing here needs a second terminal.
+
+Build the frontend once, then start the server:
+
 ```bash
-python -m sentinel.action_monitor.watcher /path/to/your/repo   # one terminal
-python -m sentinel.interfaces.dashboard /path/to/your/repo     # another
+cd dashboard && npm install && npm run build && cd ..
+python -m sentinel.interfaces.dashboard
 ```
+
+Open **http://localhost:8765** and add the folder your coding agent is about to
+work in. From the page you can start and stop watching, write and edit that
+project's rules, run any of the CLI commands above, and set up the Telegram bot
+— no config file to hand-edit and no command to remember. Pass a repo path to
+add it on startup, or `--port` if 8765 is taken.
 
 The verdict leads, then a file navigator beside the diff. The navigator behaves
 the way Finder and Explorer both do — folders before files, disclosure
@@ -493,8 +521,15 @@ Colour means status and nothing else: the four verdict levels are the only
 saturated colours on screen, so anything coloured is something that wants your
 attention. *Could not verify* is given the same weight as the verdict itself.
 
-The server binds to `127.0.0.1` only — the page quotes real source lines out of
-your repo and has no authentication, so it is not something to expose.
+The server binds to `127.0.0.1` only, and every mutating request must carry a
+per-session token embedded in the page it served, a same-origin `Origin`, and a
+JSON content type — loopback is not a boundary inside a browser, where any site
+you visit can post to localhost. It is still not something to expose: the page
+quotes real source lines out of your repo.
+
+There is also a **Visualize** view that draws the session as a rotatable 3D
+structure — the projection is about a hundred lines of TypeScript, with no 3D
+dependency behind it.
 
 ## Tests
 
@@ -502,14 +537,24 @@ your repo and has no authentication, so it is not something to expose.
 python -m unittest discover -s tests -t .
 ```
 
-482 tests, no network, under a second. Anything requiring GitHub lives in
-`tests/live_pr_check.py`, outside the suite.
+489 tests, no network, under a second. Anything requiring GitHub lives in
+`tests/live_pr_check.py`, outside the suite. The dashboard has 39 of its own:
+
+```bash
+cd dashboard && npm test
+```
+
+Two of them are worth naming, because they pin the claims this README makes:
+`tests/test_aws.py` runs one session through all four providers and fails unless
+the report comes back byte-identical, and `tests/test_egress.py` fails if a
+secret ever reaches a model prompt.
 
 ## Project status
 
-Early build. See [tasks.md](tasks.md) for the phase breakdown and current
-progress, [CLAUDE.md](CLAUDE.md) for scope, and [instructions.md](instructions.md)
-for the coding rules this repo is held to.
+Working software. Every component described above runs today, on a local model
+with no account anywhere. [tasks.md](tasks.md) has the build history and what is
+still open, [CLAUDE.md](CLAUDE.md) the scope, and
+[instructions.md](instructions.md) the coding rules this repo holds itself to.
 
 ## License
 
