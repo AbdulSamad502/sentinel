@@ -552,9 +552,10 @@ secret ever reaches a model prompt.
 ## Project status
 
 Working software. Every component described above runs today, on a local model
-with no account anywhere. [tasks.md](tasks.md) has the build history and what is
-still open, [CLAUDE.md](CLAUDE.md) the scope, and
-[instructions.md](instructions.md) the coding rules this repo holds itself to.
+with no account anywhere. Bedrock and AgentCore support (see Architecture and
+Setup above) is implemented and tested, but **not currently deployed** — model
+access on Bedrock is still pending approval. Nothing in this repo runs on AWS
+today; `ollama` is the default and what the setup instructions above use.
 
 ## License
 

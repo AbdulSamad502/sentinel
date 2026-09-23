@@ -16,3 +16,25 @@ venv/
 *.csv.download
 *.pkg
 .DS_Store
+
+# Node / frontend
+node_modules/
+dist/
+build/
+
+# Editors
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Internal dev/build-process docs — not part of the submission
+/CLAUDE.md
+/instructions.md
+/kickoff-prompt.md
+/tasks.md
+/website-prompt.md
