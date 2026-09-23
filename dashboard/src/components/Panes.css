@@ -1,0 +1,54 @@
+/* Settings, the terminal commands, and the answer to the last question. */
+
+.pane { display: flex; flex-direction: column; gap: 1.4rem; max-width: 58rem; }
+.pane h2 { font-size: 1.15rem; margin: 0; }
+.pane-block { display: flex; flex-direction: column; gap: 0.55rem; }
+.pane-block h3 {
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink-faint); margin: 0;
+}
+.pane .view-toggle { max-width: 22rem; }
+
+.legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.84rem; }
+.legend li { display: flex; align-items: center; gap: 0.55rem; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.legend-safe { background: var(--safe); }
+.legend-review { background: var(--review); }
+.legend-conditional { background: var(--conditional); }
+.legend-stop { background: var(--stop); }
+
+.command-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.85rem; }
+.command-label { font-size: 0.8rem; color: var(--ink-soft); }
+
+.command-row {
+  display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem;
+  padding: 0.45rem 0.6rem; border: 1px solid var(--rule);
+  border-radius: var(--radius); background: var(--surface-sunken);
+  overflow-x: auto;
+}
+.command-row code { font-family: var(--mono); font-size: 0.76rem; white-space: nowrap; }
+
+.copy-button {
+  margin-left: auto; flex: none; padding: 0.2rem 0.5rem;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface); color: var(--ink-faint); font-family: var(--mono);
+  font-size: 0.66rem; cursor: pointer;
+}
+.copy-button:hover { color: var(--accent); border-color: var(--accent); }
+
+.job-pane {
+  padding: 0.9rem 1rem; border: 1px solid var(--rule);
+  border-radius: 10px; background: var(--surface); box-shadow: var(--shadow);
+}
+.job-head { display: flex; align-items: baseline; justify-content: space-between; }
+.job-head h3 { font-size: 0.92rem; margin: 0; }
+
+.job-waiting { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; }
+.job-waiting p { margin: 0; font-size: 0.85rem; }
+.job-bar { display: block; height: 2px; border-radius: 2px; background: var(--accent); }
+
+.job-output {
+  margin: 0.6rem 0 0; padding: 0.7rem; border-radius: var(--radius);
+  background: var(--surface-sunken); font-family: var(--mono); font-size: 0.78rem;
+  line-height: 1.6; white-space: pre-wrap; overflow-x: auto;
+}

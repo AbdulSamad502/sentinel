@@ -1,0 +1,224 @@
+.shell {
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem) clamp(0.75rem, 3vw, 1.75rem) 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.shell-message {
+  gap: 0.6rem;
+  padding-top: 4rem;
+}
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.masthead-title h1 {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+
+.masthead-title p {
+  margin: 0.15rem 0 0;
+  font-size: 0.87rem;
+  color: var(--ink-soft);
+}
+
+.theme-toggle {
+  display: flex;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.theme-button {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  padding: 0.28rem 0.62rem;
+  color: var(--ink-faint);
+}
+
+.theme-button:hover {
+  background: var(--surface-hover);
+}
+
+.theme-button.is-on {
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+
+/* Two panes: the navigator and what it points at. On a narrow screen the tree
+   stacks above the diff and stops being full height, so both stay usable. */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(15rem, 21rem) minmax(0, 1fr);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  height: min(34rem, 70vh);
+  /* Never shrink. As a flex item in the scrolling main column it would
+     otherwise collapse to nothing and take the file tree with it. */
+  flex: none;
+  box-shadow: var(--shadow);
+}
+
+.workspace-tree {
+  border-right: 1px solid var(--rule);
+  background: var(--surface-sunken);
+  min-width: 0;
+  min-height: 0;
+}
+
+.workspace-detail {
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (max-width: 46rem) {
+  .workspace {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .workspace-tree {
+    border-right: none;
+    border-bottom: 1px solid var(--rule);
+    max-height: 16rem;
+  }
+
+  .workspace-detail {
+    max-height: 28rem;
+  }
+}
+
+.message-error {
+  color: var(--stop);
+  font-size: 0.95rem;
+}
+
+.message-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--ink-soft);
+  font-size: 0.87rem;
+}
+
+.message-hint code {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.footer {
+  border-top: 1px solid var(--rule);
+  padding-top: 0.9rem;
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+}
+
+/* --- the control-plane shell ---------------------------------------------
+ *
+ * A fixed sidebar and a scrolling main pane. The sidebar is where you move
+ * between agents; the main pane is whatever that agent is showing.
+ */
+
+.app {
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr);
+  transition: grid-template-columns 160ms ease;
+  /* A fixed viewport with the panes scrolling independently. The sidebar holds
+     the primary control - "Start watching" - and letting the page scroll it out
+     of reach on a long rules list put the main action off screen. */
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Collapsed to a rail: the agent dots stay visible, and so does the way back. */
+.app.is-collapsed { grid-template-columns: 46px minmax(0, 1fr); }
+
+@media (prefers-reduced-motion: reduce) {
+  .app { transition: none; }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  padding: 1.5rem clamp(1rem, 3vw, 2.25rem) 3rem;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.app-error {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--stop);
+  border-radius: var(--radius);
+  background: var(--stop-wash);
+  color: var(--stop);
+  font-size: 0.85rem;
+}
+
+.welcome {
+  margin: auto;
+  max-width: 34rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+.welcome h2 { font-size: 1.35rem; margin: 0; letter-spacing: -0.015em; }
+.welcome p { color: var(--ink-soft); line-height: 1.6; margin: 0; }
+.welcome .primary-button { width: auto; padding-inline: 1.4rem; margin-top: 0.4rem; }
+
+.recorded-banner {
+  margin: 0 0 0.4rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px dashed var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+/* On a narrow screen the sidebar becomes a strip above the content rather than
+   a drawer: there are rarely more than a handful of agents, and a hidden
+   control is worse than a short one. */
+@media (max-width: 860px) {
+  /* Narrow: one column, and the page scrolls as a whole again. Two independent
+     scroll areas in a phone-width column is worse than one. */
+  .app,
+  .app.is-collapsed { grid-template-columns: minmax(0, 1fr); height: auto; overflow: visible; }
+
+  .main { overflow-y: visible; }
+
+  .sidebar {
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .sidebar-foot { margin-top: 1rem; }
+
+  .main { padding: 1rem; }
+}

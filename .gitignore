@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Environment / secrets
+.env
+
+# Per-machine dev settings (each teammate picks their own local model)
+.sentinel/
+
+# Credentials / installers / macOS cruft — never commit
+*_accessKeys.csv
+*.csv.download
+*.pkg
+.DS_Store

@@ -1,0 +1,78 @@
+/* The bot setup. Numbered steps, each unlocking the next, so it is obvious
+   what is left. Colour still means status: a finished step is marked, not
+   painted. */
+
+.tg { max-width: 52rem; }
+
+.tg-step {
+  display: flex; flex-direction: column; gap: 0.55rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface);
+}
+.tg-step.is-done { background: var(--surface-sunken); border-color: var(--rule-soft); }
+
+.tg-step-head { display: flex; align-items: center; gap: 0.6rem; }
+.tg-step-head h3 { font-size: 0.95rem; margin: 0; font-weight: 500; }
+
+.tg-step-number {
+  flex: none; width: 22px; height: 22px;
+  display: grid; place-items: center;
+  border-radius: 50%; border: 1px solid var(--rule);
+  font-family: var(--mono); font-size: 0.72rem; color: var(--ink-soft);
+}
+.tg-step.is-done .tg-step-number { border-color: var(--safe); color: var(--safe); }
+
+.tg-step-body { display: flex; flex-direction: column; gap: 0.6rem; }
+.tg-step-body code {
+  font-family: var(--mono); font-size: 0.78rem;
+  background: var(--surface-sunken); padding: 1px 5px; border-radius: 4px;
+}
+
+.tg-link { align-self: flex-start; }
+
+.tg-token { display: flex; gap: 6px; flex-wrap: wrap; }
+.tg-token input {
+  flex: 1 1 20rem; padding: 0.45rem 0.6rem;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface-sunken); color: var(--ink);
+  font-family: var(--mono); font-size: 0.8rem;
+}
+.tg-token input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tg-token .primary-button { width: auto; flex: 0 0 auto; padding-inline: 1rem; }
+
+.tg-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.tg-row .primary-button, .tg-row .side-button { width: auto; flex: 0 0 auto; padding-inline: 1rem; }
+
+.tg-settled {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+  margin: 0; font-size: 0.84rem; color: var(--ink-soft);
+}
+
+.tg-chats { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.tg-chats li {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 0.5rem; border-radius: var(--radius);
+  background: var(--surface-sunken);
+}
+.tg-chat-name { font-size: 0.86rem; }
+.tg-chat-id { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-faint); }
+.tg-chats li .picker-choose, .tg-chats li .danger-link { margin-left: auto; }
+
+.tg-note {
+  margin: 0; padding: 0.5rem 0.7rem;
+  border: 1px solid var(--safe); border-radius: var(--radius);
+  background: var(--safe-wash); color: var(--safe); font-size: 0.84rem;
+}
+
+.tg-cheatsheet { display: flex; flex-direction: column; gap: 0.45rem; }
+.tg-cheatsheet h3 {
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink-faint); margin: 0.4rem 0 0;
+}
+.tg-cheatsheet ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.tg-cheatsheet li { font-size: 0.84rem; color: var(--ink-soft); }
+.tg-cheatsheet code {
+  font-family: var(--mono); font-size: 0.78rem; color: var(--ink);
+  background: var(--surface-sunken); padding: 1px 5px; border-radius: 4px; margin-right: 0.4rem;
+}

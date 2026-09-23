@@ -1,0 +1,99 @@
+/* The rotatable structure. Colour still means status: a node is coloured only
+   when something was found in that file. Everything structural is neutral. */
+
+.space { display: flex; flex-direction: column; gap: 0.9rem; }
+
+.space-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+}
+.space-head > div { display: flex; flex-direction: column; gap: 0.2rem; }
+.space-spin { flex: 0 0 auto; padding-inline: 0.9rem; }
+
+.space-stage {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0.25rem 0 0;
+  /* A darker well, so the depth fade has something to fade into and the
+     structure reads as sitting inside a space rather than on a card. */
+  background: var(--surface-sunken);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* Bounded by HEIGHT, not width. The whole point of this view is that one look
+   tells you everything, and a square map sized to the column width runs past
+   the fold on any normal screen - which is the one thing it must not do. */
+.space-svg {
+  width: auto;
+  height: min(58vh, 480px);
+  max-width: 100%;
+  overflow: visible;
+  cursor: grab;
+  touch-action: none;
+}
+.space-svg.is-dragging { cursor: grabbing; }
+
+.space-edge { stroke: var(--ink-faint); stroke-width: 0.6; }
+
+.space-core { fill: var(--surface); stroke: var(--rule); stroke-width: 1.5; }
+.space-core.core-safe { stroke: var(--safe); }
+.space-core.core-review { stroke: var(--review); }
+.space-core.core-conditional { stroke: var(--conditional); }
+.space-core.core-stop { stroke: var(--stop); }
+
+.space-core-text {
+  text-anchor: middle; font-family: var(--mono); font-weight: 600;
+  letter-spacing: 0.04em; fill: var(--ink); pointer-events: none;
+}
+
+.space-hub { fill: var(--surface); stroke: var(--ink-faint); stroke-width: 1; }
+.space-hub-text {
+  text-anchor: middle; font-family: var(--mono); fill: var(--ink-faint);
+  pointer-events: none;
+}
+
+.space-node { cursor: pointer; }
+.space-node:focus-visible { outline: none; }
+.space-node:focus-visible .space-dot { stroke: var(--accent); stroke-width: 2.5; }
+.space-node:hover .space-dot { stroke-width: 2.5; }
+
+.space-dot { stroke-width: 1.4; }
+
+/* Nothing found: neutral, so it recedes and the problems stand out. */
+.node-clean .space-dot { fill: var(--surface-hover); stroke: var(--ink-faint); }
+.node-flagged .space-dot { fill: var(--review); stroke: var(--review); }
+.node-blocked .space-dot { fill: var(--stop); stroke: var(--stop); }
+
+/* Status is shape, not colour: a deleted file is hollow, an added one heavier. */
+.space-dot.status-deleted { fill: transparent; stroke-dasharray: 3 2; }
+.space-dot.status-added { stroke-width: 2.6; }
+
+.space-halo { fill: none; stroke: var(--accent); stroke-width: 1.6; }
+
+.space-label {
+  text-anchor: middle; font-family: var(--mono); fill: var(--ink-soft);
+  pointer-events: none;
+}
+.space-node.is-selected .space-label { fill: var(--ink); font-weight: 500; }
+
+.space-hint {
+  margin: 0; padding: 0.4rem 0 0.55rem;
+  font-size: 0.72rem; color: var(--ink-faint); text-align: center;
+}
+
+.space-key {
+  list-style: none; margin: 0; padding: 0.6rem 0 0;
+  display: flex; flex-wrap: wrap; gap: 0.4rem 1rem;
+  border-top: 1px solid var(--rule-soft);
+  font-size: 0.76rem; color: var(--ink-faint);
+}
+.space-key li { display: flex; align-items: center; gap: 0.4rem; }
+
+.key-swatch { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid; flex: none; }
+.key-swatch.node-clean { background: var(--surface-hover); border-color: var(--ink-faint); }
+.key-swatch.node-flagged { background: var(--review); border-color: var(--review); }
+.key-swatch.node-blocked { background: var(--stop); border-color: var(--stop); }
+.key-hub { width: 9px; height: 9px; border-radius: 50%; background: var(--surface); border: 1px solid var(--ink-faint); flex: none; }
+
+.space-empty { text-align: center; }

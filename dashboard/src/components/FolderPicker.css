@@ -1,0 +1,74 @@
+/* Choosing a folder. A modal, because it is one decision and everything else
+   waits on it. */
+
+.picker-backdrop {
+  position: fixed; inset: 0; z-index: 40;
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+  background: rgb(25 23 19 / 42%);
+}
+
+.picker {
+  width: min(680px, 100%); max-height: min(78vh, 720px);
+  display: flex; flex-direction: column; gap: 0.75rem;
+  padding: 1.1rem; border: 1px solid var(--rule); border-radius: 11px;
+  background: var(--surface); box-shadow: var(--shadow);
+}
+
+.picker-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.picker-head h2 { font-size: 1rem; margin: 0; }
+
+.picker-path { display: flex; gap: 6px; }
+.picker-path input {
+  flex: 1; padding: 0.42rem 0.55rem; border: 1px solid var(--rule);
+  border-radius: var(--radius); background: var(--surface-sunken);
+  color: var(--ink); font-family: var(--mono); font-size: 0.78rem;
+}
+.picker-path input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.picker-path .side-button { flex: 0 0 auto; padding-inline: 0.9rem; }
+
+.picker-crumbs { display: flex; gap: 0.6rem; }
+
+.picker-list {
+  list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1;
+  border: 1px solid var(--rule-soft); border-radius: var(--radius);
+}
+.picker-list li {
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid var(--rule-soft);
+}
+.picker-list li:last-child { border-bottom: 0; }
+
+.picker-entry {
+  flex: 1; display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.45rem 0.6rem; border: 0; background: transparent;
+  color: var(--ink); font: inherit; font-size: 0.84rem; text-align: left;
+  cursor: pointer; min-height: var(--tap);
+}
+.picker-entry:hover { background: var(--surface-hover); }
+
+.picker-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.picker-tag {
+  font-family: var(--mono); font-size: 0.62rem; padding: 1px 5px;
+  border: 1px solid var(--rule); border-radius: 999px; color: var(--ink-faint);
+}
+.picker-tag.is-set { border-color: var(--accent); color: var(--accent); }
+
+.picker-choose {
+  flex: 0 0 auto; margin-right: 0.5rem; padding: 0.28rem 0.6rem;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface); color: var(--ink-soft); font: inherit;
+  font-size: 0.74rem; cursor: pointer;
+}
+.picker-choose:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+
+.picker-foot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.picker-foot .primary-button { width: auto; padding-inline: 1rem; }
+
+.picker-here {
+  font-family: var(--mono); font-size: 0.72rem; color: var(--ink-faint);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.picker-error { color: var(--stop); font-size: 0.8rem; margin: 0; }
+.picker-empty { color: var(--ink-faint); font-size: 0.8rem; margin: 0; }

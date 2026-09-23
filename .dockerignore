@@ -1,0 +1,13 @@
+# Only the package, its dependencies and its config belong in the runtime
+# image. Everything else is either the developer's machine or the local
+# interfaces, which the hosted service deliberately does not have.
+.git
+.sentinel
+.venv
+__pycache__
+*.pyc
+dashboard
+docs
+tests
+deploy
+*.md

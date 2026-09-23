@@ -1,0 +1,145 @@
+.tree {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.tree-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.tree-title {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.tree-expand {
+  font-size: 0.74rem;
+  color: var(--accent);
+  padding: 0.15rem 0.3rem;
+  border-radius: 4px;
+}
+
+.tree-expand:hover {
+  background: var(--accent-wash);
+}
+
+.tree-rows {
+  overflow: auto;
+  padding: 0.35rem 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: var(--tap);
+  padding-right: 0.6rem;
+  cursor: default;
+  user-select: none;
+  position: relative;
+}
+
+/* An indent guide, so deep nesting stays readable - both file managers draw one. */
+.tree-row::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--indent, 0px) + 14px);
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--rule-soft);
+  pointer-events: none;
+}
+
+.tree-row:hover {
+  background: var(--surface-hover);
+}
+
+.tree-row.is-selected {
+  background: var(--accent-wash);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.tree-chevron {
+  width: 0.85rem;
+  flex: none;
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+.tree-glyph {
+  flex: none;
+  display: flex;
+  color: var(--ink-faint);
+}
+
+.tree-icon {
+  display: block;
+}
+
+.tree-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.87rem;
+}
+
+.tree-badge {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0 0.25rem;
+}
+
+.tree-counts {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  gap: 0.3rem;
+}
+
+.tree-add {
+  color: var(--add);
+}
+
+.tree-remove {
+  color: var(--remove);
+}
+
+.tree-status {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  width: 0.9rem;
+  text-align: center;
+}
+
+.tree-empty {
+  padding: 1.5rem 1rem;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}

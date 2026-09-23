@@ -1,0 +1,200 @@
+.diff {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.diff-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  min-width: 0;
+}
+
+.crumb {
+  color: var(--ink-soft);
+}
+
+.crumb-sep {
+  color: var(--ink-faint);
+  padding: 0 0.2rem;
+}
+
+.crumb-file {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.diff-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.diff-status {
+  font-weight: 600;
+}
+
+.diff-add {
+  color: var(--add);
+}
+
+.diff-remove {
+  color: var(--remove);
+}
+
+.diff-findings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-sunken);
+}
+
+.diff-finding {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.finding-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  margin-top: 0.5rem;
+}
+
+.finding-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.finding-statement {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 550;
+}
+
+.finding-detail {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+
+.finding-detail code {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+}
+
+/* A regex hit is a fact; a model's judgement is an opinion. They must not read
+   identically, so the model chip is outlined rather than filled. */
+.finding-source {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+}
+
+.finding-source-pattern {
+  background: var(--surface-hover);
+  color: var(--ink-soft);
+}
+
+.finding-source-model {
+  border: 1px dashed var(--ink-faint);
+  color: var(--ink-faint);
+}
+
+.finding-evidence {
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.25rem 0.45rem;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.diff-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.5rem 0 1.5rem;
+}
+
+.diff-pre {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  min-width: max-content;
+}
+
+.diff-line {
+  padding: 0 1rem;
+  white-space: pre;
+}
+
+.diff-add {
+  background: var(--add-wash);
+  color: var(--add);
+}
+
+.diff-remove {
+  background: var(--remove-wash);
+  color: var(--remove);
+}
+
+.diff-hunk {
+  color: var(--ink-faint);
+  background: var(--surface-sunken);
+}
+
+.diff-meta-line,
+.diff-meta {
+  color: var(--ink-faint);
+}
+
+.diff-context {
+  color: var(--ink-soft);
+}
+
+.diff-empty,
+.diff-none,
+.diff-truncated {
+  padding: 1.5rem 1rem;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.diff-truncated {
+  padding-top: 0.5rem;
+  font-style: italic;
+}

@@ -1,0 +1,143 @@
+/* The agent list. The status dot is the only coloured thing here, because it
+   is the only thing carrying status. */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  padding: 1.25rem 1rem 1rem;
+  background: var(--surface);
+  border-right: 1px solid var(--rule);
+  overflow-y: auto;
+}
+
+.sidebar-brand h1 { font-size: 1.05rem; letter-spacing: -0.01em; margin: 0; }
+.sidebar-brand p { color: var(--ink-faint); font-size: 0.78rem; margin: 0.2rem 0 0; }
+
+.sidebar-section { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.sidebar-heading {
+  display: flex; align-items: baseline; justify-content: space-between;
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+
+.sidebar-empty { color: var(--ink-faint); font-size: 0.8rem; line-height: 1.5; margin: 0; }
+
+.agent-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+
+.agent-button {
+  width: 100%; display: flex; align-items: center; gap: 0.55rem;
+  padding: 0.42rem 0.5rem; border: 0; border-radius: var(--radius);
+  background: transparent; color: var(--ink); font: inherit; font-size: 0.86rem;
+  text-align: left; cursor: pointer; min-height: var(--tap);
+}
+.agent-button:hover { background: var(--surface-hover); }
+.agent-button.is-on { background: var(--accent-wash); color: var(--ink); font-weight: 500; }
+
+.agent-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.agent-warn { margin-left: auto; font-family: var(--mono); font-size: 0.64rem; color: var(--stop); }
+
+.dot { position: relative; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); }
+.dot-running { background: var(--safe); }
+.dot-unverified { background: var(--review); }
+.dot-stopped { background: var(--rule); border: 1px solid var(--ink-faint); }
+
+.dot-pulse {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: var(--safe); display: block;
+}
+
+.agent-path {
+  font-family: var(--mono); font-size: 0.68rem; color: var(--ink-faint);
+  margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  direction: rtl; text-align: left;
+}
+
+.agent-detail { font-size: 0.72rem; color: var(--review); margin: 0; line-height: 1.4; }
+
+.primary-button {
+  width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--accent);
+  border-radius: var(--radius); background: var(--accent); color: #fff;
+  font: inherit; font-size: 0.84rem; font-weight: 500; cursor: pointer; min-height: var(--tap);
+}
+.primary-button:hover:not(:disabled) { filter: brightness(1.08); }
+.primary-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.primary-button.is-stop { background: transparent; color: var(--ink); border-color: var(--rule); }
+.primary-button.is-stop:hover:not(:disabled) { background: var(--surface-hover); filter: none; }
+
+.sidebar-actions, .view-toggle { display: flex; gap: 4px; }
+
+.side-button, .toggle-button {
+  flex: 1; padding: 0.36rem 0.5rem; border: 1px solid var(--rule);
+  border-radius: var(--radius); background: var(--surface); color: var(--ink-soft);
+  font: inherit; font-size: 0.78rem; cursor: pointer; min-height: var(--tap);
+}
+.side-button:hover:not(:disabled), .toggle-button:hover { background: var(--surface-hover); }
+.side-button.is-on, .toggle-button.is-on { background: var(--accent-wash); border-color: var(--accent); color: var(--ink); }
+.side-button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.feature-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+
+.feature-button {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;
+  padding: 0.38rem 0.5rem; border: 0; border-radius: var(--radius);
+  background: transparent; color: var(--ink-soft); font: inherit; font-size: 0.8rem;
+  text-align: left; cursor: pointer; min-height: var(--tap);
+}
+.feature-button:hover:not(:disabled) { background: var(--surface-hover); color: var(--ink); }
+.feature-button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.feature-slow { font-family: var(--mono); font-size: 0.62rem; color: var(--ink-faint); }
+
+.sidebar-foot { margin-top: auto; display: flex; flex-direction: column; gap: 5px; padding-top: 0.75rem; border-top: 1px solid var(--rule-soft); }
+
+.danger-link {
+  border: 0; background: transparent; color: var(--ink-faint); font: inherit;
+  font-size: 0.74rem; text-align: left; cursor: pointer; padding: 0.3rem 0.5rem;
+}
+.danger-link:hover { color: var(--stop); }
+
+.sidebar-note { font-size: 0.68rem; color: var(--ink-faint); line-height: 1.45; margin: 0.4rem 0 0; }
+
+.link-button {
+  border: 0; background: transparent; color: var(--accent); font: inherit;
+  font-size: 0.76rem; cursor: pointer; padding: 0.2rem;
+}
+.link-button:hover { text-decoration: underline; }
+
+/* --- collapsing ----------------------------------------------------------
+ *
+ * Collapsed, the sidebar becomes a rail rather than vanishing outright: the
+ * agent dots stay visible so you can still see at a glance whether anything is
+ * watching, and there is always a way back. A panel with no visible way back is
+ * a panel people lose.
+ */
+
+.brand-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+
+.rail-button {
+  flex: none;
+  width: 26px; height: 26px;
+  display: grid; place-items: center;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface); color: var(--ink-soft);
+  font-size: 1.05rem; line-height: 1; cursor: pointer;
+}
+.rail-button:hover { background: var(--surface-hover); color: var(--ink); border-color: var(--accent); }
+
+.sidebar-rail {
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1.25rem 0.4rem 1rem;
+  overflow-x: hidden;
+}
+
+.rail-agent {
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border: 1px solid transparent; border-radius: var(--radius);
+  background: transparent; cursor: pointer;
+}
+.rail-agent:hover { background: var(--surface-hover); }
+.rail-agent.is-on { background: var(--accent-wash); border-color: var(--accent); }

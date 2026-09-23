@@ -1,0 +1,50 @@
+/* The rules a project holds its agent to.
+   The chip saying HOW a rule is checked is load-bearing: a regex hit is a fact
+   and a model's judgement is an opinion, and they must not read alike. */
+
+.norms { display: flex; flex-direction: column; gap: 1.4rem; max-width: 62rem; }
+.norms-head h2 { font-size: 1.15rem; margin: 0 0 0.3rem; }
+
+.norms-block { display: flex; flex-direction: column; gap: 0.6rem; }
+.norms-block h3 {
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink-faint); margin: 0;
+}
+
+.preset-row, .severity-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.preset-row .side-button, .severity-row .toggle-button { flex: 0 0 auto; padding-inline: 0.8rem; }
+
+.norm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+
+.norm-row {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0.6rem; border-radius: var(--radius); cursor: pointer;
+}
+.norm-row:hover { background: var(--surface-hover); }
+.norm-row input { margin-top: 0.2rem; accent-color: var(--accent); width: 15px; height: 15px; }
+
+.norm-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; }
+.norm-statement { font-size: 0.88rem; line-height: 1.45; }
+
+.norm-chip {
+  font-family: var(--mono); font-size: 0.62rem; padding: 1px 6px;
+  border-radius: 999px; border: 1px solid var(--rule); color: var(--ink-faint);
+  white-space: nowrap;
+}
+.chip-model { border-style: dashed; }
+
+.norms-custom {
+  width: 100%; padding: 0.6rem; border: 1px solid var(--rule);
+  border-radius: var(--radius); background: var(--surface-sunken);
+  color: var(--ink); font-family: var(--mono); font-size: 0.8rem; line-height: 1.6;
+  resize: vertical;
+}
+.norms-custom:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.norms-foot {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 0.75rem; padding-top: 0.9rem; border-top: 1px solid var(--rule);
+}
+.norms-save { display: flex; align-items: center; gap: 0.75rem; }
+.norms-foot .primary-button { width: auto; padding-inline: 1.2rem; }
+.norms-saved { font-size: 0.8rem; color: var(--safe); }

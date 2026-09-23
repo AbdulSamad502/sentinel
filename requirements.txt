@@ -1,0 +1,16 @@
+# Sentinel dependencies.
+# Per instructions.md #4: nothing gets added here without a stated reason.
+
+# Agent framework. The [ollama] extra is for local dev only; Phase 5 swaps the
+# model provider to AWS Bedrock (see sentinel/llm.py). [openai] is not for
+# OpenAI: Groq speaks the OpenAI wire format, and this extra is how the Groq
+# provider reaches it through Strands instead of raw HTTP.
+strands-agents[ollama,openai]
+
+# Prebuilt tool decorators/utilities used by the sub-agents.
+strands-agents-tools
+
+# Filesystem events for the Action Monitor's watcher. It arrives transitively
+# via strands-agents-tools, but we import it directly, so it is pinned as a
+# direct dependency rather than relied on by accident.
+watchdog

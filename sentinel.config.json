@@ -1,0 +1,193 @@
+{
+  "_comment": "What Sentinel lets a coding agent do in this repo. Patterns are globs matched against repo-relative, forward-slash paths. '*' crosses directory separators, so 'src/*' matches 'src/a/b.py'. Matching is case-sensitive on every platform so the team gets identical results.",
+
+  "paths": {
+    "_comment": "deny wins over allow. An empty allow list means 'anywhere not denied'.",
+    "allow": [],
+    "deny": [
+      ".git/*",
+      ".venv/*",
+      "*/node_modules/*"
+    ]
+  },
+
+  "protected_paths": {
+    "_comment": "Paths the agent may read but should not be quietly changing. Each maps to the verdict for touching it.",
+    ".env": "BLOCKED",
+    ".env.*": "BLOCKED",
+    "*.pem": "BLOCKED",
+    "*.key": "BLOCKED",
+    "*secrets*": "BLOCKED",
+    "*credentials*": "BLOCKED",
+    ".github/workflows/*": "FLAGGED",
+    "sentinel.config.json": "BLOCKED"
+  },
+
+  "dependency_files": {
+    "_comment": "Changing what the project depends on is a supply-chain decision, so it gets a human's eyes.",
+    "verdict": "FLAGGED",
+    "patterns": [
+      "requirements.txt",
+      "requirements-*.txt",
+      "pyproject.toml",
+      "poetry.lock",
+      "package.json",
+      "package-lock.json",
+      "yarn.lock",
+      "Pipfile",
+      "Pipfile.lock",
+      "go.mod",
+      "go.sum",
+      "Cargo.toml",
+      "Gemfile"
+    ]
+  },
+
+  "action_verdicts": {
+    "_comment": "Baseline verdict per action type, before any path rule is considered.",
+    "create": "ALLOWED",
+    "modify": "ALLOWED",
+    "delete": "FLAGGED",
+    "git": "ALLOWED"
+  },
+
+  "code_risk": {
+    "_comment": "Thresholds and keyword lists for the Code Risk Analyzer. All heuristics, deliberately - see instructions.md #3.",
+
+    "sensitive_paths": {
+      "_comment": "Areas where a mistake costs real money or real trust. Matched as globs on the changed file's path.",
+      "payments": ["*payment*", "*billing*", "*checkout*", "*invoice*", "*stripe*"],
+      "authentication": ["*auth*", "*login*", "*session*", "*password*", "*token*"],
+      "permissions": ["*permission*", "*role*", "*admin*", "*acl*"],
+      "configuration": ["*config*", "*settings*", "Dockerfile", "*.tf", "*.yaml", "*.yml"],
+      "data loss": ["*migration*", "*schema*", "*.sql"]
+    },
+
+    "test_paths": {
+      "_comment": "How we recognise a test file. Used by the missing-test heuristic.",
+      "patterns": ["test_*", "*_test.*", "tests/*", "*/tests/*", "spec/*", "*.spec.*", "*.test.*"]
+    },
+
+    "source_extensions": {
+      "_comment": "Files we expect to be covered by tests. Docs and config are exempt.",
+      "extensions": [".py", ".js", ".ts", ".jsx", ".tsx", ".go", ".rb", ".java", ".rs", ".php", ".cs"]
+    },
+
+    "ignore_extensions": {
+      "_comment": "Assets and docs carry no logic risk, so they are exempt from the sensitive-area keywords. Without this, 'admin/css/widgets.css' gets reported as permissions code purely because 'admin' appears in its path.",
+      "extensions": [".css", ".scss", ".less", ".svg", ".png", ".jpg", ".jpeg", ".gif", ".ico", ".woff", ".woff2", ".md", ".rst", ".txt", ".lock", ".map", ".snap"]
+    },
+
+    "thresholds": {
+      "_comment": "Tuned to be noticeable but not shrill. Adjust here, never in Python.",
+      "large_file_changes": 300,
+      "huge_file_changes": 800,
+      "large_change_total": 1000,
+      "many_files": 30,
+      "high_churn_commits": 10,
+      "churn_lookback": 30
+    }
+  },
+
+  "norms": {
+    "_comment": "This project's own rules for the coding agent, in plain English. A norm with 'patterns' is checked by regex - deterministic, free, offline. A norm with only a 'statement' is judged by the model, because no regex catches 'don't redesign the UI without asking'. Severity is always set here by a human, never by the model: FLAGGED means a human should look, BLOCKED means do not ship. Write these by hand, or run: python -m sentinel.norms.wizard <repo>",
+
+    "rules": [
+      {
+        "id": "no-hardcoded-credentials",
+        "statement": "Never commit a real API key, token, or password. Read them from the environment or a secrets manager.",
+        "severity": "BLOCKED",
+        "patterns": [
+          "\\bsk-[A-Za-z0-9]{20,}",
+          "\\bAKIA(?![0-9A-Z]*EXAMPLE\\b)[0-9A-Z]{16}\\b",
+          "\\bghp_[A-Za-z0-9]{30,}",
+          "-----BEGIN [A-Z ]*PRIVATE KEY-----"
+        ],
+        "except_paths": ["test_*", "*_test.*", "tests/*", "*/tests/*", "*.md"]
+      },
+      {
+        "id": "no-disabled-certificate-checks",
+        "statement": "Never turn off TLS certificate verification. Fix the certificate instead.",
+        "severity": "BLOCKED",
+        "patterns": [
+          "(?i)\\b(requests|httpx|aiohttp|session|client|urlopen|\\.get|\\.post|\\.put|\\.patch|\\.delete|\\.head|\\.request)\\b[^\\n]*\\bverify\\s*=\\s*False\\b",
+          "\\brejectUnauthorized\\s*:\\s*false\\b",
+          "\\bssl\\._create_unverified_context\\b"
+        ],
+        "except_paths": ["test_*", "*_test.*", "tests/*", "*/tests/*", "*.md"]
+      },
+      {
+        "id": "no-hardcoded-model-ids",
+        "statement": "Model identifiers belong in configuration, never inline in code. In this repo that means sentinel/llm.py and nowhere else.",
+        "severity": "FLAGGED",
+        "patterns": [
+          "[\"'](gpt-[0-9][\\w.\\-]*)[\"']",
+          "[\"'](claude-[\\w.\\-]*[0-9][\\w.\\-]*)[\"']",
+          "[\"'](gemini-[0-9][\\w.\\-]*)[\"']"
+        ],
+        "except_paths": ["test_*", "*_test.*", "tests/*", "*/tests/*", "*.md", "sentinel/llm.py"]
+      },
+      {
+        "id": "no-skipped-tests",
+        "statement": "Do not disable a test to make a change pass.",
+        "severity": "FLAGGED",
+        "patterns": ["\\b(it|test|describe)\\.skip\\s*\\(", "@(unittest\\.)?skip\\b", "@pytest\\.mark\\.skip\\b"]
+      },
+      {
+        "id": "ask-before-new-dependencies",
+        "statement": "Do not add a new third-party dependency without asking first. The standard library is preferred.",
+        "severity": "FLAGGED"
+      },
+      {
+        "id": "stay-on-task",
+        "statement": "Only change what the task asked for. Unrelated refactors, reformatting and cleanups need their own request.",
+        "severity": "FLAGGED"
+      }
+    ]
+  },
+
+  "session": {
+    "_comment": "Bounds on the snapshot the watcher takes when it starts. Anything left out is named in the session's meta.json and reported as 'could not check' - never silently dropped.",
+    "max_snapshot_bytes": 200000,
+    "max_total_bytes": 5000000
+  },
+
+  "explain": {
+    "_comment": "Token budgets for the Change Explainer. Trimmed diffs are marked as trimmed in the text the model sees, so it is never misled into describing a partial change as the whole one.",
+    "max_diff_lines": 120,
+    "max_files": 25
+  },
+
+  "model": {
+    "_comment": "Which LLM this INSTALLATION of Sentinel talks to. Read only from Sentinel's own config, never from a watched repo's - a project we supervise must not be able to redirect our model calls. Every value here is overridden by the matching environment variable (SENTINEL_PROVIDER, SENTINEL_BEDROCK_MODEL, SENTINEL_AWS_REGION, SENTINEL_AGENTCORE_ENDPOINT, SENTINEL_AGENTCORE_ARN).",
+    "provider": "ollama",
+    "aws_region": "us-east-1",
+    "bedrock_model_id": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "agentcore_endpoint": "",
+    "agentcore_arn": ""
+  },
+
+  "git_commands": {
+    "_comment": "Matched as substrings against the git command the agent ran, after collapsing whitespace. Listed worst-first in spirit; all matches are reported.",
+    "BLOCKED": [
+      "push --force",
+      "push -f",
+      "reset --hard",
+      "clean -fd",
+      "clean -fdx",
+      "branch -D",
+      "filter-branch",
+      "update-ref -d"
+    ],
+    "FLAGGED": [
+      "rebase",
+      "checkout .",
+      "restore .",
+      "stash drop",
+      "stash clear",
+      "cherry-pick",
+      "commit --amend",
+      "tag -d"
+    ]
+  }
+}

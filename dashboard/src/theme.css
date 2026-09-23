@@ -1,0 +1,162 @@
+/*
+ * Sentinel's palette.
+ *
+ * One governing rule: COLOUR MEANS STATUS. Sentinel has a four-rung verdict
+ * ladder, so those four are the only saturated colours in the interface, and
+ * anything coloured is something that needs attention. Spending colour on
+ * decoration would dilute the one signal that matters.
+ *
+ * Neutrals are warm graphite with a faint ochre bias. No blue anywhere, and no
+ * slate or steel greys either - those read as blue-adjacent.
+ *
+ * The single non-semantic accent is a muted violet, used only for interactive
+ * affordances, so "you can click this" never gets confused with "this is a
+ * problem".
+ */
+
+:root {
+  --ground: #f2f1ed;
+  --surface: #ffffff;
+  --surface-sunken: #eae8e2;
+  --surface-hover: #e6e3dc;
+  --ink: #191713;
+  --ink-soft: #5c564c;
+  --ink-faint: #8b8375;
+  --rule: #dfdbd2;
+  --rule-soft: #ebe8e2;
+
+  --safe: #2e7d5b;
+  --safe-wash: #e4efe9;
+  --review: #a6720c;
+  --review-wash: #f6eeda;
+  --conditional: #b4571c;
+  --conditional-wash: #f8e9dd;
+  --stop: #a83228;
+  --stop-wash: #f8e3e0;
+
+  --accent: #6e4a7e;
+  --accent-wash: #f0e9f3;
+
+  --add: #2e7d5b;
+  --add-wash: #e6f1ea;
+  --remove: #a83228;
+  --remove-wash: #faE7e4;
+
+  --shadow: 0 1px 2px rgb(25 23 19 / 6%), 0 8px 24px rgb(25 23 19 / 5%);
+
+  --sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --radius: 7px;
+  --tap: 30px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #1a1815;
+    --surface: #242019;
+    --surface-sunken: #16130f;
+    --surface-hover: #2f2a22;
+    --ink: #f0ede6;
+    --ink-soft: #a9a192;
+    --ink-faint: #7c7466;
+    --rule: #332d25;
+    --rule-soft: #292420;
+
+    --safe: #6bc49a;
+    --safe-wash: #17251e;
+    --review: #e0a93c;
+    --review-wash: #262010;
+    --conditional: #ee9152;
+    --conditional-wash: #2a1d12;
+    --stop: #f07f72;
+    --stop-wash: #2b1815;
+
+    --accent: #b98fc9;
+    --accent-wash: #241c28;
+
+    --add: #6bc49a;
+    --add-wash: #17251e;
+    --remove: #f07f72;
+    --remove-wash: #2b1815;
+
+    --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 30%);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #1a1815;
+  --surface: #242019;
+  --surface-sunken: #16130f;
+  --surface-hover: #2f2a22;
+  --ink: #f0ede6;
+  --ink-soft: #a9a192;
+  --ink-faint: #7c7466;
+  --rule: #332d25;
+  --rule-soft: #292420;
+
+  --safe: #6bc49a;
+  --safe-wash: #17251e;
+  --review: #e0a93c;
+  --review-wash: #262010;
+  --conditional: #ee9152;
+  --conditional-wash: #2a1d12;
+  --stop: #f07f72;
+  --stop-wash: #2b1815;
+
+  --accent: #b98fc9;
+  --accent-wash: #241c28;
+
+  --add: #6bc49a;
+  --add-wash: #17251e;
+  --remove: #f07f72;
+  --remove-wash: #2b1815;
+
+  --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 30%);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
