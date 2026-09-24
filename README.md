@@ -1,6 +1,19 @@
+<div align="center">
+
 # Sentinel
 
 **A supervisory agent for AI coding agents.**
+
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)](requirements.txt)
+[![Tests: 489 passing](https://img.shields.io/badge/tests-489%20passing-brightgreen.svg)](#tests)
+[![Runs locally by default](https://img.shields.io/badge/runs-locally%20by%20default-7c3aed.svg)](#setup)
+
+▶ [**Demo video**](https://youtu.be/vCUupeO_Zjw) · [Architecture](#architecture) · [Setup](#setup) · [Dashboard](#the-dashboard)
+
+</div>
+
+---
 
 Sentinel does not write code. It watches an AI coding agent — Claude Code,
 Cursor, Copilot Workspace — while that agent works on a codebase, and answers
@@ -8,7 +21,32 @@ one question continuously:
 
 > Is what this agent is doing safe, correct, and shippable?
 
-**Demo video:** https://youtu.be/vCUupeO_Zjw
+<details>
+<summary><strong>Table of contents</strong></summary>
+
+- [The problem](#the-problem)
+- [Components](#components)
+- [Architecture](#architecture)
+- [Setup](#setup)
+- [Watching a repo](#watching-a-repo)
+- [Scoring a change](#scoring-a-change)
+- [The verdict](#the-verdict)
+- [What did it just do?](#what-did-it-just-do)
+- [Your project's own rules](#your-projects-own-rules)
+- [Let the agent ask *before* it writes](#let-the-agent-ask-before-it-writes)
+- [Catching dangerous git commands](#catching-dangerous-git-commands)
+- [Just ask it](#just-ask-it)
+- [When it goes wrong](#when-it-goes-wrong)
+- [In your pipeline](#in-your-pipeline)
+- [The dashboard](#the-dashboard)
+- [Tests](#tests)
+- [Project status](#project-status)
+- [Team](#team)
+- [License](#license)
+
+</details>
+
+---
 
 ## The problem
 
@@ -23,12 +61,14 @@ and gives a clear verdict with reasons:
 
 | Verdict | Meaning |
 | --- | --- |
-| **SAFE** | Nothing concerning. Ship it. |
-| **REVIEW** | A human should look before this merges. |
-| **CONDITIONAL** | Fine *if* the named conditions are met. |
-| **STOP** | Do not proceed. Something is wrong. |
+| ![SAFE](https://img.shields.io/badge/SAFE-brightgreen) | Nothing concerning. Ship it. |
+| ![REVIEW](https://img.shields.io/badge/REVIEW-yellow) | A human should look before this merges. |
+| ![CONDITIONAL](https://img.shields.io/badge/CONDITIONAL-orange) | Fine *if* the named conditions are met. |
+| ![STOP](https://img.shields.io/badge/STOP-red) | Do not proceed. Something is wrong. |
 
 Sentinel **observes, analyses, and reports**. It does not act on your codebase.
+
+---
 
 ## Components
 
@@ -49,6 +89,8 @@ Sentinel **observes, analyses, and reports**. It does not act on your codebase.
    plain English and checked on every change.
 7. **Agent Consultation** — the coding agent can ask Sentinel for the rules
    *before* it writes, over MCP. Every question it asks is reported to you.
+
+---
 
 ## Architecture
 
@@ -144,6 +186,8 @@ the **Telegram bot** answers the human, and **MCP** answers the coding agent
 itself. Only observations flow into Sentinel, and only text flows out — nothing
 in any direction can change your code.
 
+---
+
 ## Setup
 
 Requires Python 3.11+. [Ollama](https://ollama.com) runs the model locally, and
@@ -196,6 +240,8 @@ it.
 python -m sentinel.doctor .        # says which provider you are on, and what is missing
 ```
 
+---
+
 ## Watching a repo
 
 The Action Monitor works today. Point it at the repo your coding agent is about
@@ -226,6 +272,8 @@ stricter or looser should never require a code change.
 `STOP` means *this should not have happened*, not *Sentinel stopped it*. It
 reports; you decide.
 
+---
+
 ## Scoring a change
 
 The Code Risk Analyzer scores a pull request on four cheap, explainable
@@ -245,6 +293,8 @@ Risk: HIGH across 3 changed file(s)
 Set `GITHUB_TOKEN` to raise GitHub's rate limit from 60 to 5000 requests an
 hour. A signal that couldn't be checked is reported as *could not check* — it
 is never quietly treated as a pass.
+
+---
 
 ## The verdict
 
@@ -294,6 +344,8 @@ between runs on the same input isn't a supervisor.
 **An unverified check is never a pass.** If Sentinel couldn't read CI, or wasn't
 watching when the agent worked, it says so and refuses to call the change SAFE.
 
+---
+
 ## What did it just do?
 
 A coding agent can rewrite twelve files in ninety seconds. Reading that by hand
@@ -323,6 +375,8 @@ Everything above the narration is computed, not generated — so if the model is
 unavailable, you still get the file list and the line counts. `--plain` skips
 the model entirely and spends no tokens; `--detail src/checkout/discount.py`
 explains one file in depth.
+
+---
 
 ## Your project's own rules
 
@@ -369,6 +423,8 @@ own:
 python -m sentinel.norms.checker --audit /path/to/some/repo
 ```
 
+---
+
 ## Let the agent ask *before* it writes
 
 Catching a mistake is second best. The best case is the coding agent knowing the
@@ -405,6 +461,8 @@ Project rules broken:
   - src/checkout.py:1 breaks 'no-hardcoded-model-ids' (found by pattern): MODEL = "gpt-4o"
 ```
 
+---
+
 ## Catching dangerous git commands
 
 Filesystem events can't see a `git push --force`. Git hooks can:
@@ -424,6 +482,8 @@ returned non-zero would abort your push, and Sentinel does not act on your work.
 It covers push, commit and rebase; `reset --hard` and `clean -fd` have no git
 hook at all, so nothing can report them, and Sentinel says so rather than
 implying coverage it doesn't have.
+
+---
 
 ## Just ask it
 
@@ -471,6 +531,8 @@ whoever messaged it, so you can add yourself and restart.
 It replies; it never initiates. It sends no alerts, and it never messages your
 coding agent — asking *"how do I fix it?"* returns the correction text **to you**.
 
+---
+
 ## When it goes wrong
 
 **A deleted file usually isn't lost.** Sentinel snapshots the tree before the
@@ -509,6 +571,8 @@ python -m sentinel.doctor /path/to/your/repo
 Every warning names its own remedy, and nothing that still works is called a
 failure — Sentinel runs fine with no model, it just has less to say.
 
+---
+
 ## In your pipeline
 
 ```bash
@@ -520,6 +584,8 @@ python -m sentinel.orchestrator.session_review /path/to/repo --exit-code
 on STOP so a CI job can gate on it — note that it's *your* pipeline config doing
 the blocking. Sentinel reports; the GitHub client stays read-only and posts
 nothing.
+
+---
 
 ## The dashboard
 
@@ -560,6 +626,8 @@ There is also a **Visualize** view that draws the session as a rotatable 3D
 structure — the projection is about a hundred lines of TypeScript, with no 3D
 dependency behind it.
 
+---
+
 ## Tests
 
 ```bash
@@ -576,6 +644,8 @@ cd dashboard && npm test
 One of them is worth naming, because it pins a claim this README makes:
 `tests/test_egress.py` fails if a secret ever reaches a model prompt.
 
+---
+
 ## Project status
 
 Working software. Every component described above runs today, on a local
@@ -583,14 +653,28 @@ model (`ollama`) with no account anywhere — the Action Monitor, Code Risk
 Analyzer, orchestrator, explainer, norms, MCP server, Telegram bot, and
 dashboard — and that is what the setup instructions above use.
 
+---
+
 ## Team
 
 Sentinel was designed and developed by a three-person collaborative engineering
 team:
 
-- **Zaved Davdani** — [@ZavedDavdani](https://github.com/ZavedDavdani)
-- **Wasif** — [@wasifhaq434701-png](https://github.com/wasifhaq434701-png)
-- **Samad** — [@AbdulSamad502](https://github.com/AbdulSamad502)
+<table>
+<tr>
+<td align="center">
+<a href="https://github.com/ZavedDavdani"><img src="https://github.com/ZavedDavdani.png" width="80" alt="Zaved Davdani"/><br/><b>Zaved Davdani</b></a><br/>@ZavedDavdani
+</td>
+<td align="center">
+<a href="https://github.com/wasifhaq434701-png"><img src="https://github.com/wasifhaq434701-png.png" width="80" alt="Wasif"/><br/><b>Wasif</b></a><br/>@wasifhaq434701-png
+</td>
+<td align="center">
+<a href="https://github.com/AbdulSamad502"><img src="https://github.com/AbdulSamad502.png" width="80" alt="Samad"/><br/><b>Samad</b></a><br/>@AbdulSamad502
+</td>
+</tr>
+</table>
+
+---
 
 ## License
 
