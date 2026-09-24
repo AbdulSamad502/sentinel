@@ -6,10 +6,10 @@
 
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)](requirements.txt)
-[![Tests: 489 passing](https://img.shields.io/badge/tests-489%20passing-brightgreen.svg)](#tests)
-[![Runs locally by default](https://img.shields.io/badge/runs-locally%20by%20default-7c3aed.svg)](#setup)
+[![Tests: 489 passing](https://img.shields.io/badge/tests-489%20passing-brightgreen.svg)](#-tests)
+[![Runs locally by default](https://img.shields.io/badge/runs-locally%20by%20default-7c3aed.svg)](#-setup)
 
-▶ [**Demo video**](https://youtu.be/vCUupeO_Zjw) · [Architecture](#architecture) · [Setup](#setup) · [Dashboard](#the-dashboard)
+▶ [**Demo video**](https://youtu.be/vCUupeO_Zjw) · [Architecture](#-architecture) · [Setup](#-setup) · [Dashboard](#-the-dashboard)
 
 </div>
 
@@ -24,31 +24,31 @@ one question continuously:
 <details>
 <summary><strong>Table of contents</strong></summary>
 
-- [The problem](#the-problem)
-- [Components](#components)
-- [Architecture](#architecture)
-- [Setup](#setup)
-- [Watching a repo](#watching-a-repo)
-- [Scoring a change](#scoring-a-change)
-- [The verdict](#the-verdict)
-- [What did it just do?](#what-did-it-just-do)
-- [Your project's own rules](#your-projects-own-rules)
-- [Let the agent ask *before* it writes](#let-the-agent-ask-before-it-writes)
-- [Catching dangerous git commands](#catching-dangerous-git-commands)
-- [Just ask it](#just-ask-it)
-- [When it goes wrong](#when-it-goes-wrong)
-- [In your pipeline](#in-your-pipeline)
-- [The dashboard](#the-dashboard)
-- [Tests](#tests)
-- [Project status](#project-status)
-- [Team](#team)
-- [License](#license)
+- [🚨 The problem](#-the-problem)
+- [🧩 Components](#-components)
+- [🧱 Architecture](#-architecture)
+- [🔧 Setup](#-setup)
+- [👀 Watching a repo](#-watching-a-repo)
+- [📊 Scoring a change](#-scoring-a-change)
+- [✅ The verdict](#-the-verdict)
+- [📝 What did it just do?](#-what-did-it-just-do)
+- [📋 Your project's own rules](#-your-projects-own-rules)
+- [💬 Let the agent ask *before* it writes](#-let-the-agent-ask-before-it-writes)
+- [🛑 Catching dangerous git commands](#-catching-dangerous-git-commands)
+- [❓ Just ask it](#-just-ask-it)
+- [🩹 When it goes wrong](#-when-it-goes-wrong)
+- [🔁 In your pipeline](#-in-your-pipeline)
+- [💻 The dashboard](#-the-dashboard)
+- [🧪 Tests](#-tests)
+- [📦 Project status](#-project-status)
+- [👥 Team](#-team)
+- [📄 License](#-license)
 
 </details>
 
 ---
 
-## The problem
+## 🚨 The problem
 
 Developers increasingly hand real work to AI coding agents. Those agents can
 touch files they shouldn't, delete or overwrite things silently, claim "done"
@@ -70,7 +70,7 @@ Sentinel **observes, analyses, and reports**. It does not act on your codebase.
 
 ---
 
-## Components
+## 🧩 Components
 
 1. **Action Monitor** — watches the coding agent's file writes, deletes,
    dependency changes and git commands; enforces path allow/deny lists; flags
@@ -92,7 +92,7 @@ Sentinel **observes, analyses, and reports**. It does not act on your codebase.
 
 ---
 
-## Architecture
+## 🧱 Architecture
 
 ```mermaid
 flowchart TD
@@ -155,7 +155,7 @@ by `synthesize()`, which is deterministic — and a test runs the same session
 through both providers and requires the report to come back byte-identical.
 The model narrates what was decided; it does not decide.
 
-### Where your code goes
+### 📡 Where your code goes
 
 A tool that reads your code should tell you where it sends it. `ollama` is the
 default, and on it nothing leaves your machine.
@@ -188,7 +188,7 @@ in any direction can change your code.
 
 ---
 
-## Setup
+## 🔧 Setup
 
 Requires Python 3.11+. [Ollama](https://ollama.com) runs the model locally, and
 Node 20+ builds the dashboard.
@@ -221,7 +221,7 @@ or just preference), set the model explicitly:
 SENTINEL_MODEL=qwen3:4b python tests/hello_agent.py
 ```
 
-### Running on a hosted model instead
+### 🌐 Running on a hosted model instead
 
 Nothing above needs an account anywhere. To use a hosted model, set the provider
 and its model id — no other code or config changes:
@@ -242,7 +242,7 @@ python -m sentinel.doctor .        # says which provider you are on, and what is
 
 ---
 
-## Watching a repo
+## 👀 Watching a repo
 
 The Action Monitor works today. Point it at the repo your coding agent is about
 to work on:
@@ -274,7 +274,7 @@ reports; you decide.
 
 ---
 
-## Scoring a change
+## 📊 Scoring a change
 
 The Code Risk Analyzer scores a pull request on four cheap, explainable
 signals: does it touch sensitive areas (payments, auth, permissions), is the
@@ -296,7 +296,7 @@ is never quietly treated as a pass.
 
 ---
 
-## The verdict
+## ✅ The verdict
 
 The orchestrator combines what the Action Monitor saw, what the Code Risk
 Analyzer scored, and whether CI passed, into one answer:
@@ -346,7 +346,7 @@ watching when the agent worked, it says so and refuses to call the change SAFE.
 
 ---
 
-## What did it just do?
+## 📝 What did it just do?
 
 A coding agent can rewrite twelve files in ninety seconds. Reading that by hand
 is slow, and asking the agent to summarise its own work costs tokens and asks
@@ -378,7 +378,7 @@ explains one file in depth.
 
 ---
 
-## Your project's own rules
+## 📋 Your project's own rules
 
 Every project has rules no linter knows: *no hardcoded model ids*, *don't make
 frontend design decisions without asking*, *never widen a CORS policy*. Tell
@@ -425,7 +425,7 @@ python -m sentinel.norms.checker --audit /path/to/some/repo
 
 ---
 
-## Let the agent ask *before* it writes
+## 💬 Let the agent ask *before* it writes
 
 Catching a mistake is second best. The best case is the coding agent knowing the
 rules up front — and it can, because Sentinel speaks **MCP**, which Claude Code,
@@ -463,7 +463,7 @@ Project rules broken:
 
 ---
 
-## Catching dangerous git commands
+## 🛑 Catching dangerous git commands
 
 Filesystem events can't see a `git push --force`. Git hooks can:
 
@@ -485,7 +485,7 @@ implying coverage it doesn't have.
 
 ---
 
-## Just ask it
+## ❓ Just ask it
 
 You handed the agent a task and walked away. You don't want a report format —
 you want to ask a question:
@@ -509,7 +509,7 @@ answer comes from the same computed verdict the CLI prints. Only a question that
 matches nothing reaches the model, and even then the model is handed the finished
 report and asked to find the answer in it. It can restate. It cannot decide.
 
-### From your phone
+### 📱 From your phone
 
 ```bash
 export SENTINEL_TELEGRAM_TOKEN=...             # from @BotFather
@@ -533,7 +533,7 @@ coding agent — asking *"how do I fix it?"* returns the correction text **to yo
 
 ---
 
-## When it goes wrong
+## 🩹 When it goes wrong
 
 **A deleted file usually isn't lost.** Sentinel snapshots the tree before the
 agent starts, so it can hand you the exact command back:
@@ -573,7 +573,7 @@ failure — Sentinel runs fine with no model, it just has less to say.
 
 ---
 
-## In your pipeline
+## 🔁 In your pipeline
 
 ```bash
 python -m sentinel.orchestrator.session_review /path/to/repo --markdown
@@ -587,7 +587,7 @@ nothing.
 
 ---
 
-## The dashboard
+## 💻 The dashboard
 
 The dashboard is the way most people use Sentinel. It keeps a registry of the
 repos you supervise and starts and stops the watcher processes itself, so
@@ -628,7 +628,7 @@ dependency behind it.
 
 ---
 
-## Tests
+## 🧪 Tests
 
 ```bash
 python -m unittest discover -s tests -t .
@@ -646,7 +646,7 @@ One of them is worth naming, because it pins a claim this README makes:
 
 ---
 
-## Project status
+## 📦 Project status
 
 Working software. Every component described above runs today, on a local
 model (`ollama`) with no account anywhere — the Action Monitor, Code Risk
@@ -655,7 +655,7 @@ dashboard — and that is what the setup instructions above use.
 
 ---
 
-## Team
+## 👥 Team
 
 Sentinel was designed and developed by a three-person collaborative engineering
 team:
@@ -676,6 +676,6 @@ team:
 
 ---
 
-## License
+## 📄 License
 
 [Apache 2.0](LICENSE)
