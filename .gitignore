@@ -21,6 +21,7 @@ venv/
 node_modules/
 dist/
 build/
+*.tsbuildinfo
 
 # Editors
 .vscode/
@@ -38,3 +39,7 @@ build/
 /kickoff-prompt.md
 /tasks.md
 /website-prompt.md
+
+# Stale duplicate config — the real one is /sentinel.config.json
+# (sentinel/shared/config_file.py only ever reads the repo-root copy)
+/sentinel/sentinel.config.json

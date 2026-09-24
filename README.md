@@ -8,6 +8,8 @@ one question continuously:
 
 > Is what this agent is doing safe, correct, and shippable?
 
+**Demo video:** https://youtu.be/vCUupeO_Zjw
+
 ## The problem
 
 Developers increasingly hand real work to AI coding agents. Those agents can
@@ -50,26 +52,65 @@ Sentinel **observes, analyses, and reports**. It does not act on your codebase.
 
 ## Architecture
 
-```
-Clients:  CLI watcher + git hooks  ·  Telegram bot  ·  dashboard  ·  MCP (the coding agent)
-                     |
-Orchestrator:  the verdict, computed deterministically, on your machine
-                     |
-run_agent()  ->  one of four model providers, chosen by SENTINEL_PROVIDER
-                     |
-  ollama          bedrock           groq            agentcore
-  a model on      AWS Bedrock,      Groq's API,     a container you deploy
-  this laptop     your credentials  your key        to Bedrock AgentCore
+```mermaid
+flowchart TD
+    classDef proc fill:#ede9fe,stroke:#7c3aed,color:#4c1d95;
+    classDef decision fill:#ddd6fe,stroke:#7c3aed,color:#4c1d95;
+    classDef terminal fill:#f5f3ff,stroke:#7c3aed,color:#4c1d95;
+    classDef stop fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d;
+
+    Agent([AI coding agent<br/>Claude Code / Cursor / Copilot]):::terminal
+    Agent -->|writes, deletes,<br/>git commands| Repo[(Your repo)]:::terminal
+    Agent -.->|asks first, over MCP:<br/>sentinel_project_rules,<br/>sentinel_check_my_work| MCPTools[[MCP tools<br/>read-only]]:::proc
+
+    Repo --> Watcher[Action Monitor<br/>watcher + git hooks]:::proc
+    Watcher --> Rules{matched against<br/>sentinel.config.json<br/>allow / deny / protected}:::decision
+    Rules -->|denied pattern| Blocked[BLOCKED]:::stop
+    Rules -->|needs a human| Flagged[FLAGGED]:::proc
+    Rules -->|clean| Allowed[ALLOWED]:::proc
+
+    Repo --> Analyzer[Code Risk Analyzer<br/>sensitive paths · churn ·<br/>missing tests · diff size]:::proc
+    CI[/CI or test status<br/>optional, read-only/]:::terminal --> Orchestrator
+
+    Blocked --> Orchestrator
+    Flagged --> Orchestrator
+    Allowed --> Orchestrator
+    Analyzer --> Orchestrator
+
+    Orchestrator{{Orchestrator<br/>synthesize · deterministic}}:::decision --> Verdict{Verdict}:::decision
+    Verdict -->|nothing concerning| Safe[SAFE]:::terminal
+    Verdict -->|a human should look| Review[REVIEW]:::terminal
+    Verdict -->|fine if conditions met| Conditional[CONDITIONAL]:::terminal
+    Verdict -->|do not proceed| Stop[STOP]:::stop
+
+    Model((ollama / groq<br/>narrates only,<br/>never decides)):::proc
+    Orchestrator -.->|hands the finished report to| Model
+    Model -.-> Report
+
+    Safe --> Report[Report + plain-English reasons]:::proc
+    Review --> Report
+    Conditional --> Report
+    Stop --> Report
+
+    Report --> CLI[CLI]:::terminal
+    Report --> Dashboard[Dashboard]:::terminal
+    Report --> Telegram[Telegram bot]:::terminal
+    Report --> MCPTools
 ```
 
+Everything left of the Orchestrator is pure observation — Sentinel never writes
+to your repo. Everything right of it is deterministic Python; the model only
+narrates the `Report` box in plain English, from data it's handed after the
+verdict is already fixed.
+
 The model provider lives behind a single seam in
-[`sentinel/llm.py`](sentinel/llm.py), so switching between the four is one
+[`sentinel/llm.py`](sentinel/llm.py), so switching between the two is one
 environment variable. Every interface goes through one function,
 `query.answer()`, for the same reason.
 
 **The verdict is never the model's to make**, on any provider. It is computed
 by `synthesize()`, which is deterministic — and a test runs the same session
-through all four providers and requires the report to come back byte-identical.
+through both providers and requires the report to come back byte-identical.
 The model narrates what was decided; it does not decide.
 
 ### Where your code goes
@@ -80,13 +121,11 @@ default, and on it nothing leaves your machine.
 | `SENTINEL_PROVIDER` | The model runs | What leaves your machine |
 | --- | --- | --- |
 | `ollama` *(default)* | on your laptop | nothing |
-| `bedrock` | in **your own** AWS account | diffs, to an account you control, under your IAM role |
-| `agentcore` | in a runtime **you** deploy | diffs, to that runtime — never stored, never used for a verdict |
 | `groq` | Groq's API | diffs, to a third party |
 
-What is sent, on the three non-local providers, is the diff of what your coding
-agent just changed — so the change can be narrated and judged against the
-project rules you wrote. Two things bound it:
+What is sent, on `groq`, is the diff of what your coding agent just changed —
+so the change can be narrated and judged against the project rules you wrote.
+Two things bound it:
 
 - **Secret-bearing paths are withheld.** A change to `.env`, `*.pem`, `*.key`,
   or anything matching `*secrets*` / `*credentials*` is reported to the model as
@@ -144,11 +183,6 @@ Nothing above needs an account anywhere. To use a hosted model, set the provider
 and its model id — no other code or config changes:
 
 ```bash
-export SENTINEL_PROVIDER=bedrock
-export SENTINEL_BEDROCK_MODEL=<a model id your account can invoke>
-```
-
-```bash
 export SENTINEL_PROVIDER=groq
 export SENTINEL_GROQ_MODEL=<a current Groq model id>
 export GROQ_API_KEY=<your key>
@@ -156,16 +190,11 @@ export GROQ_API_KEY=<your key>
 
 The Groq key is read from the environment only, never from `sentinel.config.json`
 — that file is committed, and a secret has no business being offered a home in
-it. `agentcore` points this machine at a container you have deployed, via
-`SENTINEL_AGENTCORE_ENDPOINT`. Whichever you pick:
+it.
 
 ```bash
 python -m sentinel.doctor .        # says which provider you are on, and what is missing
 ```
-
-AWS account and Bedrock setup are in [docs/aws-setup.md](docs/aws-setup.md);
-building and deploying the runtime container is in
-[docs/deploy-agentcore.md](docs/deploy-agentcore.md).
 
 ## Watching a repo
 
@@ -544,18 +573,24 @@ python -m unittest discover -s tests -t .
 cd dashboard && npm test
 ```
 
-Two of them are worth naming, because they pin the claims this README makes:
-`tests/test_aws.py` runs one session through all four providers and fails unless
-the report comes back byte-identical, and `tests/test_egress.py` fails if a
-secret ever reaches a model prompt.
+One of them is worth naming, because it pins a claim this README makes:
+`tests/test_egress.py` fails if a secret ever reaches a model prompt.
 
 ## Project status
 
-Working software. Every component described above runs today, on a local model
-with no account anywhere. Bedrock and AgentCore support (see Architecture and
-Setup above) is implemented and tested, but **not currently deployed** — model
-access on Bedrock is still pending approval. Nothing in this repo runs on AWS
-today; `ollama` is the default and what the setup instructions above use.
+Working software. Every component described above runs today, on a local
+model (`ollama`) with no account anywhere — the Action Monitor, Code Risk
+Analyzer, orchestrator, explainer, norms, MCP server, Telegram bot, and
+dashboard — and that is what the setup instructions above use.
+
+## Team
+
+Sentinel was designed and developed by a three-person collaborative engineering
+team:
+
+- **Zaved Davdani** — [@ZavedDavdani](https://github.com/ZavedDavdani)
+- **Wasif** — [@wasifhaq434701-png](https://github.com/wasifhaq434701-png)
+- **Samad** — [@AbdulSamad502](https://github.com/AbdulSamad502)
 
 ## License
 
